@@ -5,7 +5,12 @@ using UnityEngine;
 public class PlayerCarController : MonoBehaviour
 {
     public ArcanePad Pad { get; private set; }
-    private float speed = 0.1f;
+    public float speed = 0.5f;
+    private const float maxRotationRateX = 2.5f;
+    private const float maxRotationRateY = 2.5f;
+    private const float maxRotationRateZ = 2.5f;
+    private Quaternion lastGamepadRotation = Quaternion.identity;
+
     public void Initialize(ArcanePad pad)
     {
         Pad = pad;
@@ -14,13 +19,28 @@ public class PlayerCarController : MonoBehaviour
         Pad.OnGetQuaternion((GetQuaternionEvent e) =>
         {
             if (PlayerManager.isGamePaused) return;
-            transform.rotation = new Quaternion(e.x, e.y, e.z, e.w);
+            ApplyRotationBasedOnXYZ(new Quaternion(-e.y, e.x, e.z, e.w));
         });
+    }
+
+    void ApplyRotationBasedOnXYZ(Quaternion gamepadRotation)
+    {
+        if (Quaternion.Dot(lastGamepadRotation, gamepadRotation) < 0)
+        {
+            gamepadRotation = new Quaternion(-gamepadRotation.x, -gamepadRotation.y, -gamepadRotation.z, -gamepadRotation.w);
+        }
+
+        float rotationRateX = gamepadRotation.x * maxRotationRateX;
+        float rotationRateY = gamepadRotation.y * maxRotationRateY;
+        float rotationRateZ = gamepadRotation.z * maxRotationRateZ;
+
+        transform.Rotate(rotationRateX, rotationRateY, rotationRateZ);
+
+        lastGamepadRotation = gamepadRotation;
     }
 
     void FixedUpdate()
     {
         transform.Translate(new Vector3(0, 0, speed));
     }
-
 }
