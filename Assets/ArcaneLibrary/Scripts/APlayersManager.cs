@@ -7,7 +7,7 @@ using ArcanepadSDK;
 public class PlayerManager : MonoBehaviour
 {
     public GameObject playerPrefab;
-    public List<PlayerController> players = new List<PlayerController>();
+    public List<PlayerCarController> players = new List<PlayerCarController>();
     public bool gameStarted { get; private set; }
     public static bool isGamePaused = false;
     async void Start()
@@ -52,13 +52,13 @@ public class PlayerManager : MonoBehaviour
     void createPlayer(ArcanePad pad)
     {
         GameObject newPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
-        PlayerController playerComponent = newPlayer.GetComponent<PlayerController>();
+        PlayerCarController playerComponent = newPlayer.GetComponent<PlayerCarController>();
         playerComponent.Initialize(pad);
 
         players.Add(playerComponent);
     }
 
-    void destroyPlayer(PlayerController playerComponent)
+    void destroyPlayer(PlayerCarController playerComponent)
     {
         playerComponent.Pad.Dispose();
         players.Remove(playerComponent);

@@ -238,7 +238,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3073522121939297705}
-  - component: {fileID: 8831647733385032951}
+  - component: {fileID: 1253688036238732030}
   m_Layer: 0
   m_Name: CarPlayer
   m_TagString: Untagged
@@ -263,7 +263,7 @@ Transform:
   - {fileID: 9092032475410797932}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
---- !u!114 &8831647733385032951
+--- !u!114 &1253688036238732030
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -272,6 +272,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 8106831683592141609}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba53df095a64c484bbd1fd2edc2828f4, type: 3}
+  m_Script: {fileID: 11500000, guid: 0a8f3532930b9654f898959b5ab5b444, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
