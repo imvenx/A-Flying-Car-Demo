@@ -14,6 +14,8 @@ public class PlayerCarController : MonoBehaviour
     private Quaternion lastReferenceRotation;
     private bool isDrivingEnabled = false;
     public TextMeshProUGUI speedText;
+    public TextMeshProUGUI nameText;
+    public MeshRenderer carMesh;
 
     private float rotationX = 0f;
     private float rotationY = 0f;
@@ -22,6 +24,13 @@ public class PlayerCarController : MonoBehaviour
     public void Initialize(ArcanePad pad)
     {
         Pad = pad;
+
+        Color userColor = GameUtils.HexToColor("#" + Pad.User.color);
+        carMesh.material.color = userColor;
+
+        nameText.text = Pad.User.name;
+        nameText.color = userColor;
+
 
         Pad.StartGetQuaternion();
         Pad.OnGetQuaternion((GetQuaternionEvent e) =>
