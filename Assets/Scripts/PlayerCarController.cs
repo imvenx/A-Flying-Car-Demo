@@ -25,11 +25,11 @@ public class PlayerCarController : MonoBehaviour
         Pad.StartGetQuaternion();
         Pad.OnGetQuaternion((GetQuaternionEvent e) =>
         {
-            if (!isDrivingEnabled)
-            {
-                lastReferenceRotation = new Quaternion(-e.y, e.x, e.z, e.w);
-                return;
-            }
+            // if (!isDrivingEnabled)
+            // {
+            //     lastReferenceRotation = new Quaternion(-e.y, e.x, e.z, e.w);
+            //     return;
+            // }
             ComputeRotationBasedOnXYZ(new Quaternion(-e.y, e.x, e.z, e.w));
         });
 
@@ -41,28 +41,23 @@ public class PlayerCarController : MonoBehaviour
         Pad.On(GameEvent.EnableDrive, (EnableDriveEvent e) =>
         {
             isDrivingEnabled = true;
-            Debug.Log(isDrivingEnabled);
         });
 
         Pad.On(GameEvent.DisableDrive, (DisableDriveEvent e) =>
         {
             isDrivingEnabled = false;
-            Debug.Log(isDrivingEnabled);
         });
     }
 
     void Update()
     {
         transform.Translate(new Vector3(0, 0, speed));
-        if (isDrivingEnabled)
-        {
-            transform.Rotate(rotationX, rotationY, rotationZ);
-        }
+        if (isDrivingEnabled) transform.Rotate(rotationX, rotationY, rotationZ);
     }
 
     void ComputeRotationBasedOnXYZ(Quaternion gamepadRotation)
     {
-        gamepadRotation = Quaternion.Inverse(lastReferenceRotation) * gamepadRotation;
+        // gamepadRotation = Quaternion.Inverse(lastReferenceRotation) * gamepadRotation;
 
         if (Quaternion.Dot(lastGamepadRotation, gamepadRotation) < 0)
         {
