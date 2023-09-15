@@ -10,6 +10,13 @@ public class PlayerCarController : MonoBehaviour
     private const float maxRotationRateY = 2.5f;
     private const float maxRotationRateZ = 2.5f;
     private Quaternion lastGamepadRotation = Quaternion.identity;
+    private Quaternion lastReferenceRotation;
+    private bool isDrivingEnabled = false;
+
+    // Rotation values to be applied in FixedUpdate
+    private float rotationX = 0f;
+    private float rotationY = 0f;
+    private float rotationZ = 0f;
 
     public void Initialize(ArcanePad pad)
     {
@@ -18,29 +25,54 @@ public class PlayerCarController : MonoBehaviour
         Pad.StartGetQuaternion();
         Pad.OnGetQuaternion((GetQuaternionEvent e) =>
         {
-            if (PlayerManager.isGamePaused) return;
-            ApplyRotationBasedOnXYZ(new Quaternion(-e.y, e.x, e.z, e.w));
+            if (!isDrivingEnabled)
+            {
+                lastReferenceRotation = new Quaternion(-e.y, e.x, e.z, e.w);
+                return;
+            }
+            ComputeRotationBasedOnXYZ(new Quaternion(-e.y, e.x, e.z, e.w));
+        });
+
+        Pad.On(GameEvent.ChangeSpeed, (ChangeSpeedEvent e) =>
+        {
+            speed = e.speed * 0.05f;
+        });
+
+        Pad.On(GameEvent.EnableDrive, (EnableDriveEvent e) =>
+        {
+            isDrivingEnabled = true;
+            Debug.Log(isDrivingEnabled);
+        });
+
+        Pad.On(GameEvent.DisableDrive, (DisableDriveEvent e) =>
+        {
+            isDrivingEnabled = false;
+            Debug.Log(isDrivingEnabled);
         });
     }
 
-    void ApplyRotationBasedOnXYZ(Quaternion gamepadRotation)
+    void Update()
     {
+        transform.Translate(new Vector3(0, 0, speed));
+        if (isDrivingEnabled)
+        {
+            transform.Rotate(rotationX, rotationY, rotationZ);
+        }
+    }
+
+    void ComputeRotationBasedOnXYZ(Quaternion gamepadRotation)
+    {
+        gamepadRotation = Quaternion.Inverse(lastReferenceRotation) * gamepadRotation;
+
         if (Quaternion.Dot(lastGamepadRotation, gamepadRotation) < 0)
         {
             gamepadRotation = new Quaternion(-gamepadRotation.x, -gamepadRotation.y, -gamepadRotation.z, -gamepadRotation.w);
         }
 
-        float rotationRateX = gamepadRotation.x * maxRotationRateX;
-        float rotationRateY = gamepadRotation.y * maxRotationRateY;
-        float rotationRateZ = gamepadRotation.z * maxRotationRateZ;
-
-        transform.Rotate(rotationRateX, rotationRateY, rotationRateZ);
+        rotationX = gamepadRotation.x * maxRotationRateX;
+        rotationY = gamepadRotation.y * maxRotationRateY;
+        rotationZ = gamepadRotation.z * maxRotationRateZ;
 
         lastGamepadRotation = gamepadRotation;
-    }
-
-    void FixedUpdate()
-    {
-        transform.Translate(new Vector3(0, 0, speed));
     }
 }
