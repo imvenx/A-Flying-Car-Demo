@@ -57,6 +57,8 @@ public class PlayersManager : MonoBehaviour
         playerComponent.Initialize(pad);
 
         players.Add(playerComponent);
+
+        UpdateCameraViewports();
     }
 
     void destroyPlayer(PlayerCarController playerComponent)
@@ -64,6 +66,21 @@ public class PlayersManager : MonoBehaviour
         playerComponent.Pad.Dispose();
         players.Remove(playerComponent);
         Destroy(playerComponent.gameObject);
+
+        UpdateCameraViewports();
+    }
+
+    void UpdateCameraViewports()
+    {
+        if (players.Count == 1)
+        {
+            players[0].playerCamera.rect = new Rect(0, 0, 1, 1); // Full screen
+        }
+        else if (players.Count == 2)
+        {
+            players[0].playerCamera.rect = new Rect(0, 0, 0.5f, 1); // Left half of the screen
+            players[1].playerCamera.rect = new Rect(0.5f, 0, 0.5f, 1); // Right half of the screen
+        }
     }
 
 }

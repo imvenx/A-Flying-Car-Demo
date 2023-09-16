@@ -16,7 +16,7 @@ public class PlayerCarController : MonoBehaviour
     public TextMeshProUGUI speedText;
     public TextMeshProUGUI nameText;
     public MeshRenderer carMesh;
-
+    public Camera playerCamera;
     private float rotationX = 0f;
     private float rotationY = 0f;
     private float rotationZ = 0f;
@@ -31,7 +31,6 @@ public class PlayerCarController : MonoBehaviour
         nameText.text = Pad.User.name;
         nameText.color = userColor;
 
-
         Pad.StartGetQuaternion();
         Pad.OnGetQuaternion((GetQuaternionEvent e) =>
         {
@@ -45,7 +44,7 @@ public class PlayerCarController : MonoBehaviour
 
         Pad.On(GameEvent.ChangeSpeed, (ChangeSpeedEvent e) =>
         {
-            speed = e.speed * 0.05f;
+            speed = e.speed * 0.2f;
             speedText.text = e.speed.ToString();
         });
 

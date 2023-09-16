@@ -148,7 +148,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -170,7 +170,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 5000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -245,7 +245,7 @@ Canvas:
   m_GameObject: {fileID: 4667716431641875321}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 961637877328636679}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -753,3 +753,4 @@ MonoBehaviour:
   speedText: {fileID: 4735357071613413180}
   nameText: {fileID: 3331049956399648698}
   carMesh: {fileID: 6845874704619413047}
+  playerCamera: {fileID: 961637877328636679}
