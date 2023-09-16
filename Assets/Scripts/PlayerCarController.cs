@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerCarController : MonoBehaviour
 {
     public ArcanePad Pad { get; private set; }
-    public float speed = 0.5f;
+    public float speed = 0.1f;
     private const float maxRotationRateX = 2.5f;
     private const float maxRotationRateY = 2.5f;
     private const float maxRotationRateZ = 2.5f;
@@ -44,7 +44,7 @@ public class PlayerCarController : MonoBehaviour
 
         Pad.On(GameEvent.ChangeSpeed, (ChangeSpeedEvent e) =>
         {
-            speed = e.speed * 0.2f;
+            speed = e.speed * 1.0f;
             speedText.text = e.speed.ToString();
         });
 
