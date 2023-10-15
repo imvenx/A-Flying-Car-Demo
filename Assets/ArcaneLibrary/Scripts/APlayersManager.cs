@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using ArcanepadSDK.Models;
 using ArcanepadSDK;
+using TMPro;
+using UnityEngine.SceneManagement;
+using ArcanepadSDK.Types;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -10,9 +13,19 @@ public class PlayerManager : MonoBehaviour
     public List<PlayerController> players = new List<PlayerController>();
     public bool gameStarted { get; private set; }
     public static bool isGamePaused = false;
+    public TextMeshProUGUI deviceTypeText;
     async void Start()
     {
+        Arcane.Init();
+
         var initialState = await Arcane.ArcaneClientInitialized();
+
+        deviceTypeText.text = Arcane.Msg.DeviceType;
+
+        if (Arcane.Msg.DeviceType == ArcaneDeviceType.pad)
+        {
+            SceneManager.LoadScene("PadScene");
+        }
 
         initialState.pads.ForEach(pad =>
         {
@@ -33,8 +46,7 @@ public class PlayerManager : MonoBehaviour
             var playerExists = players.Any(p => p.Pad.IframeId == e.iframeId);
             if (playerExists) return;
 
-            var pad = new ArcanePad(deviceId: e.deviceId, internalId: e.internalId, iframeId: e.iframeId, isConnected: true,
-            user: Arcane.Devices.FirstOrDefault(d => d.id == e.deviceId).user);
+            var pad = new ArcanePad(deviceId: e.deviceId, internalId: e.internalId, iframeId: e.iframeId, isConnected: true, user: e.user);
 
             createPlayer(pad);
         });

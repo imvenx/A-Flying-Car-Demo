@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using ArcanepadSDK.Types;
 
 namespace ArcanepadSDK.Models
 {
@@ -82,8 +83,8 @@ namespace ArcanepadSDK.Models
     public class ClientDisconnectEvent : ArcaneBaseEvent
     {
         public string clientId;
-        public ArcaneClientType clientType;
-        public ClientDisconnectEvent(string clientId, ArcaneClientType clientType) : base(AEventName.ClientDisconnect)
+        public string clientType;
+        public ClientDisconnectEvent(string clientId, string clientType) : base(AEventName.ClientDisconnect)
         {
             this.clientId = clientId;
             this.clientType = clientType;
@@ -95,12 +96,14 @@ namespace ArcanepadSDK.Models
         public string deviceId { get; set; }
         public string internalId { get; set; }
         public string iframeId { get; set; }
+        public ArcaneUser user { get; set; }
 
-        public IframePadConnectEvent(string clientId, string internalId, string deviceId) : base(AEventName.IframePadConnect)
+        public IframePadConnectEvent(string clientId, string internalId, string deviceId, ArcaneUser user) : base(AEventName.IframePadConnect)
         {
             iframeId = clientId;
             this.internalId = internalId;
             this.deviceId = deviceId;
+            this.user = user;
         }
     }
 
@@ -134,7 +137,7 @@ namespace ArcanepadSDK.Models
         }
     }
 
-    public class CalibrateQuaternion : ArcaneBaseEvent { public CalibrateQuaternion() : base(AEventName.CalibrateQuaternion) { } }
+    public class CalibrateQuaternionEvent : ArcaneBaseEvent { public CalibrateQuaternionEvent() : base(AEventName.CalibrateQuaternion) { } }
 
     public class StartGetRotationEulerEvent : ArcaneBaseEvent { public StartGetRotationEulerEvent() : base(AEventName.StartGetRotationEuler) { } }
     public class StopGetRotationEulerEvent : ArcaneBaseEvent { public StopGetRotationEulerEvent() : base(AEventName.StopGetRotationEuler) { } }
@@ -166,7 +169,17 @@ namespace ArcanepadSDK.Models
         }
     }
 
-    public class CalibratePointer : ArcaneBaseEvent { public CalibratePointer() : base(AEventName.CalibratePointer) { } }
+    public class CalibratePointerEvent : ArcaneBaseEvent
+    {
+        bool isTopLeft;
+        public CalibratePointerEvent(bool isTopLeft) : base(AEventName.CalibratePointer)
+        {
+            this.isTopLeft = isTopLeft;
+        }
+    }
+
+    public class SetScreenOrientationPortraitEvent : ArcaneBaseEvent { public SetScreenOrientationPortraitEvent() : base(AEventName.SetScreenOrientationPortrait) { } }
+    public class SetScreenOrientationLandscapeEvent : ArcaneBaseEvent { public SetScreenOrientationLandscapeEvent() : base(AEventName.SetScreenOrientationLandscape) { } }
 
     public class VibrateEvent : ArcaneBaseEvent
     {

@@ -13,6 +13,8 @@ public class PlayersManager : MonoBehaviour
     public static bool isGamePaused = false;
     async void Start()
     {
+        Arcane.Init();
+
         var initialState = await Arcane.ArcaneClientInitialized();
 
         initialState.pads.ForEach(pad =>

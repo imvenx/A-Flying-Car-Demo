@@ -91,7 +91,7 @@ namespace ArcanepadSDK
 
         public void CalibrateQuaternion()
         {
-            Msg.Emit(new CalibrateQuaternion(), InternalIdList);
+            Msg.Emit(new CalibrateQuaternionEvent(), InternalIdList);
         }
         public void StartGetRotationEuler()
         {
@@ -125,10 +125,13 @@ namespace ArcanepadSDK
             Events.On($"{AEventName.GetPointer}_{InternalId}", callback);
         }
 
-        public void CalibratePointer()
+        public void CalibratePointer(bool isTopLeft)
         {
-            Msg.Emit(new CalibratePointer(), InternalIdList);
+            Msg.Emit(new CalibratePointerEvent(isTopLeft), InternalIdList);
         }
+
+        public void SetScreenOrientationPortrait() { Msg.Emit(new SetScreenOrientationPortraitEvent(), InternalIdList); }
+        public void SetScreenOrientationLandscape() { Msg.Emit(new SetScreenOrientationLandscapeEvent(), InternalIdList); }
 
         public void Vibrate(int millisecconds)
         {

@@ -4,13 +4,16 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ArcanepadSDK;
+using ArcanepadSDK.AUtils;
 using ArcanepadSDK.Models;
+using ArcanepadSDK.Types;
+using UnityEditor;
 using UnityEngine;
 
 public class Arcane : MonoBehaviour
 {
     public static WebSocketService<string> Msg;
-    public static IList<ArcaneDevice> Devices;
+    public static IList<ArcaneDevice> Devices = new List<ArcaneDevice>();
     public static List<ArcanePad> Pads = new List<ArcanePad>();
     private static List<string> InternalViewsIds = new List<string>();
     private static List<string> InternalPadsIds = new List<string>();
@@ -22,7 +25,16 @@ public class Arcane : MonoBehaviour
     private static extern void SetFullScreen();
 
     [SerializeField]
-    public ArcaneDeviceTypeEnum DeviceType;
+    private static ArcaneDeviceTypeEnum DeviceType;
+    [SerializeField]
+    private static string Port = "3005";
+    [SerializeField]
+    private static string ReverseProxyPort = "3009";
+
+    private static ArcaneInitParams _arcaneInitParams;
+    // [SerializeField]
+    // private string ArcaneCode = "";
+
     private static TaskCompletionSource<InitialState> _arcaneClientInitialized = new TaskCompletionSource<InitialState>();
     // private static TaskCompletionSource<ArcaneClientInitializeEvent> _ArcaneClientInitialized = new TaskCompletionSource<ArcaneClientInitializeEvent>();
 
@@ -39,14 +51,22 @@ public class Arcane : MonoBehaviour
 
         DontDestroyOnLoad(this);
 
-        string url = "wss://localhost:3005";
-#if DEBUG || UNITY_EDITOR || UNITY_STANDALONE
-        url = "ws://localhost:3009";
-#endif
+        // string url = "wss://localhost:3005";
+        // #if DEBUG || UNITY_EDITOR || UNITY_STANDALONE
+        // url = "ws://localhost:3009";
+        // #endif
+    }
 
-        Devices = new List<ArcaneDevice>();
+    public static void Init(ArcaneInitParams arcaneInitParams = null)
+    {
+        if (arcaneInitParams == null) arcaneInitParams = new ArcaneInitParams();
+
+        _arcaneInitParams = arcaneInitParams;
+
         var deviceType = DeviceType == ArcaneDeviceTypeEnum.view ? ArcaneDeviceType.view : ArcaneDeviceType.pad;
-        Msg = new WebSocketService<string>(url, ArcaneDeviceType.view);
+        // var arcaneInitParams = new ArcaneInitParams(deviceType, Port, ReverseProxyPort);
+
+        Msg = new WebSocketService<string>(arcaneInitParams);
 
         Action unsubscribeInit = null;
         unsubscribeInit = Msg.On(AEventName.Initialize, (InitializeEvent e, string from) => Initialize(e, unsubscribeInit));
@@ -57,7 +77,7 @@ public class Arcane : MonoBehaviour
     void Update()
     {
 #if UNITY_EDITOR || UNITY_STANDALONE 
-        if (Msg != null)
+        if (Msg != null && Msg.Ws != null)
         {
             Msg.Ws.DispatchMessageQueue();
         }
@@ -74,23 +94,44 @@ public class Arcane : MonoBehaviour
         Msg.Ws.Close();
     }
 
-    private void Initialize(InitializeEvent e, Action unsubscribeInit)
+    private static void Initialize(InitializeEvent e, Action unsubscribeInit)
     {
+        unsubscribeInit();
+
         RefreshGlobalState(e.globalState);
 
-        // if (DeviceType == ArcaneDeviceTypeEnum.pad)
-        // {
-        Pad = Pads.FirstOrDefault(p => p.DeviceId == Msg.DeviceId);
-        // }
+        var deviceType = Devices.FirstOrDefault(d => d.id == Msg.DeviceId).deviceType;
+
+        if (deviceType == ArcaneDeviceType.pad && Msg.ClientType == ArcaneClientType.iframe) PadInitialization();
+        if (deviceType == ArcaneDeviceType.view) ViewInitialization();
 
         var initialState = new InitialState(Pads);
 
         _arcaneClientInitialized.SetResult(initialState);
 
-        unsubscribeInit();
+        // Msg.OnInitialize(e);
     }
 
-    private void RefreshGlobalState(GlobalState globalState)
+    private static void PadInitialization()
+    {
+        Pad = Pads.FirstOrDefault(p => p.DeviceId == Msg.DeviceId);
+
+        if (Pad == null)
+        {
+            Debug.LogError("Pad is null");
+            return;
+        }
+
+        if (_arcaneInitParams.padOrientation == AOrientation.Landscape) Pad.SetScreenOrientationLandscape();
+        if (_arcaneInitParams.padOrientation == AOrientation.Portrait) Pad.SetScreenOrientationPortrait();
+    }
+
+    private static void ViewInitialization()
+    {
+        if (_arcaneInitParams.hideMouse) Cursor.visible = false;
+    }
+
+    private static void RefreshGlobalState(GlobalState globalState)
     {
         Devices = globalState.devices;
 
@@ -99,7 +140,7 @@ public class Arcane : MonoBehaviour
         Pads = GetPads(Devices);
     }
 
-    public List<ArcanePad> GetPads(IList<ArcaneDevice> _devices)
+    private static List<ArcanePad> GetPads(IList<ArcaneDevice> _devices)
     {
         var pads = new List<ArcanePad>();
 
@@ -166,7 +207,7 @@ public class Arcane : MonoBehaviour
     //     });
     // }
 
-    void RefreshClientsIds(IList<ArcaneDevice> _devices)
+    private static void RefreshClientsIds(IList<ArcaneDevice> _devices)
     {
         InternalPadsIds = _devices.Where(device => device.deviceType == ArcaneDeviceType.pad).SelectMany(device => device.clients
             .Where(client => client.clientType == ArcaneClientType.@internal).Select(client => client.id)).ToList();
