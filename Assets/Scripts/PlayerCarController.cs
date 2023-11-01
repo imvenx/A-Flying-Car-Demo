@@ -36,10 +36,10 @@ public class PlayerCarController : MonoBehaviour
         {
             if (!isDrivingEnabled)
             {
-                lastReferenceRotation = new Quaternion(-e.y, e.x, e.z, e.w);
+                lastReferenceRotation = new Quaternion(e.y, -e.x, e.z, e.w);
                 return;
             }
-            ComputeRotationBasedOnXYZ(new Quaternion(-e.y, e.x, e.z, e.w));
+            ComputeRotationBasedOnXYZ(new Quaternion(e.y, -e.x, e.z, e.w));
         });
 
         Pad.On(GameEvent.ChangeSpeed, (ChangeSpeedEvent e) =>
