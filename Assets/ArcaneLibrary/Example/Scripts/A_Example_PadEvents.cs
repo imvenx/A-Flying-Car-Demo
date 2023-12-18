@@ -1,8 +1,6 @@
 using ArcanepadSDK.Models;
-
-namespace ArcanepadSDK.PadEvents
+namespace ArcanepadExample
 {
-
     public abstract class PadEvent : ArcaneBaseEvent
     {
         public PadEvent(string name) : base(name) { }
@@ -47,5 +45,4 @@ namespace ArcanepadSDK.PadEvents
     {
         public BackEvent() : base(AEventName.Back) { }
     }
-
 }

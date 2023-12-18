@@ -54,6 +54,8 @@ public class PlayersManager : MonoBehaviour
 
     void createPlayer(ArcanePad pad)
     {
+        if (string.IsNullOrEmpty(pad.IframeId)) return;
+
         GameObject newPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
         PlayerCarController playerComponent = newPlayer.GetComponent<PlayerCarController>();
         playerComponent.Initialize(pad);

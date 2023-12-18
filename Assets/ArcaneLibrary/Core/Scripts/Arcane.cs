@@ -4,7 +4,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ArcanepadSDK;
-using ArcanepadSDK.AUtils;
 using ArcanepadSDK.Models;
 using ArcanepadSDK.Types;
 using UnityEditor;
@@ -12,7 +11,7 @@ using UnityEngine;
 
 public class Arcane : MonoBehaviour
 {
-    public static WebSocketService<string> Msg;
+    public static AWebSocketService<string> Msg;
     public static IList<ArcaneDevice> Devices = new List<ArcaneDevice>();
     public static List<ArcanePad> Pads = new List<ArcanePad>();
     private static List<string> InternalViewsIds = new List<string>();
@@ -20,16 +19,16 @@ public class Arcane : MonoBehaviour
     public static List<string> IframeViewsIds = new List<string>();
     public static List<string> IframePadsIds = new List<string>();
     public static ArcanePad Pad { get; private set; }
-    public string LibraryVersion { get; } = "1.0.0";
+    public string LibraryVersion { get; } = "1.5.0";
     [DllImport("__Internal")]
     private static extern void SetFullScreen();
 
     [SerializeField]
     private static ArcaneDeviceTypeEnum DeviceType;
-    [SerializeField]
-    private static string Port = "3005";
-    [SerializeField]
-    private static string ReverseProxyPort = "3009";
+    // [SerializeField]
+    // private static string Port = "3685";
+    // [SerializeField]
+    // private static string ReverseProxyPort = "3689";
 
     private static ArcaneInitParams _arcaneInitParams;
     // [SerializeField]
@@ -66,7 +65,7 @@ public class Arcane : MonoBehaviour
         var deviceType = DeviceType == ArcaneDeviceTypeEnum.view ? ArcaneDeviceType.view : ArcaneDeviceType.pad;
         // var arcaneInitParams = new ArcaneInitParams(deviceType, Port, ReverseProxyPort);
 
-        Msg = new WebSocketService<string>(arcaneInitParams);
+        Msg = new AWebSocketService<string>(arcaneInitParams);
 
         Action unsubscribeInit = null;
         unsubscribeInit = Msg.On(AEventName.Initialize, (InitializeEvent e, string from) => Initialize(e, unsubscribeInit));
@@ -102,7 +101,7 @@ public class Arcane : MonoBehaviour
 
         var deviceType = Devices.FirstOrDefault(d => d.id == Msg.DeviceId).deviceType;
 
-        if (deviceType == ArcaneDeviceType.pad && Msg.ClientType == ArcaneClientType.iframe) PadInitialization();
+        if (deviceType == ArcaneDeviceType.pad) PadInitialization();
         if (deviceType == ArcaneDeviceType.view) ViewInitialization();
 
         var initialState = new InitialState(Pads);
@@ -144,22 +143,22 @@ public class Arcane : MonoBehaviour
     {
         var pads = new List<ArcanePad>();
 
-        var padDevices = _devices.Where(device => device.deviceType == ArcaneDeviceType.pad && device.clients.Any(c => c.clientType == ArcaneClientType.iframe)).ToList();
+        var padDevices = _devices.Where(device => device.deviceType == ArcaneDeviceType.pad).ToList();
 
         padDevices.ForEach(padDevice =>
         {
             var iframeClientId = padDevice.clients.FirstOrDefault(c => c.clientType == ArcaneClientType.iframe)?.id;
             var internalClientId = padDevice.clients.FirstOrDefault(c => c.clientType == ArcaneClientType.@internal)?.id;
 
-            if (string.IsNullOrEmpty(iframeClientId))
-            {
-                Debug.LogError("Tried to set pad but iframeClientId was not found");
-            }
+            // if (string.IsNullOrEmpty(iframeClientId))
+            // {
+            //     Debug.LogError("Tried to set pad but iframeClientId was not found");
+            // }
 
-            if (string.IsNullOrEmpty(internalClientId))
-            {
-                Debug.LogError("Tried to set pad but internalClientId was not found");
-            }
+            // if (string.IsNullOrEmpty(internalClientId))
+            // {
+            //     Debug.LogError("Tried to set pad but internalClientId was not found");
+            // }
 
             pads.Add(new ArcanePad(
                 deviceId: padDevice.id,
